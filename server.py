@@ -8,7 +8,8 @@ from collections import namedtuple
 import smtplib
 from email.message import EmailMessage
 import sqlite3
-import client, device
+from client import *
+from device import *
 
 EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASS')
