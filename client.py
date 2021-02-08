@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import sqlite3
 import csv
 from argparse import ArgumentParser
-
+# TODO: Implement PostgreSQL instead of SQLite
 
 @dataclass
 class Client:
@@ -11,11 +11,10 @@ class Client:
     email: str = None
     phone: str = None
 
-def rebuild(filename):
+def _rebuild(filename):
     with open(filename) as f:
         r = csv.reader(f)
         rows = list(row for row in r)
-        # print(list(rows))
 
         conn = sqlite3.connect('clients.db')
         c = conn.cursor()
@@ -35,15 +34,14 @@ def rebuild(filename):
             ''', rows)
 
 
-def get_clients(client_ids: list[int]) -> list[Client]:
+def get_clients_from_client_ids(client_ids: list[int]) -> list[Client]:
     conn = sqlite3.connect('clients.db')
     c = conn.cursor()
     with conn:
         c.execute("""
         select * from clients where client_id in (%s)
         """ % (', '.join(str(client_id) for client_id in client_ids)))
-        x = c.fetchall()
-        pass
+        return [Client(client) for client in c.fetchall()]
 
 class Arguments:
     rebuild: str
@@ -54,4 +52,4 @@ if __name__ == '__main__':
     args = args.parse_args(namespace=Arguments)
 
     if args.rebuild:
-        rebuild(args.rebuild)
+        _rebuild(args.rebuild)
